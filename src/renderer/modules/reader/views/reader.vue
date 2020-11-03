@@ -87,7 +87,7 @@
   import path from "path";
   import iconv from "iconv-lite";
   import {exec} from 'child_process';
-  import {remote} from "electron";
+  import {remote, ipcRenderer} from "electron";
   import {mapState, mapMutations} from 'vuex';
   import {debounce} from 'lodash';
   import WebWorker from 'simple-web-worker';
@@ -153,7 +153,13 @@
         handler(n) {
           this.getLibraryList();
         }
-      }
+      },
+      theme: {
+        immediate: true,
+        handler(n) {
+          this.saveThemeData(n);
+        }
+      },
     },
     methods: {
       init() {
@@ -213,7 +219,7 @@
         xhr.open('GET', `file:/${book.url}`, true);
         xhr.send(null);
         xhr.onreadystatechange = () => {
-          switch(xhr.readyState){
+          switch (xhr.readyState) {
             case 0:
               // 此时对象尚未初始化，也没有调用open方法
               break;
@@ -438,6 +444,16 @@
       // 设置标题
       setDocTitle() {
         document.title = `${this.book.name} - ${this.chapterContent[0].txt}`;
+      },
+
+      // 保存主题到配置文件
+      saveThemeData(themeActive) {
+        let data = fs.readFileSync(this.optionsFile, {encoding: 'utf-8'});
+        data = JSON.parse(data);
+        let {theme} = data;
+        theme.active = themeActive || "dark";
+        this.saveConfig(data);
+        ipcRenderer.send("setBackgroundColor", theme.opts[theme.active]);
       },
 
       ...mapMutations([

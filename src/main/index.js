@@ -1,4 +1,5 @@
 import {app, BrowserWindow, ipcMain, Tray, globalShortcut, Menu} from 'electron';
+import fs from "fs";
 import path from "path";
 import keyEvent from "../renderer/utils/keyEventConfig";
 
@@ -26,7 +27,7 @@ function createWindow() {
     icon: `${__static}/icons/logo.png`,
     // frame: false,
     // transparent: true,
-    backgroundColor: "#4e82ff",
+    backgroundColor: getBackgroundColor(),
     webPreferences: {
       webSecurity: false // 禁用窗口同源策略
     }
@@ -134,6 +135,15 @@ function createMenu() {
   } else {
     Menu.setApplicationMenu(null);
   }
+}
+
+// 获取背景色
+function getBackgroundColor() {
+  let data = fs.readFileSync(`${__static}/reader.json`, "utf8");
+  if (!data) return "#ffffff";
+  let themeData = JSON.parse(data).theme;
+  let activeTheme = themeData.active || "dark";
+  return themeData.opts[activeTheme];
 }
 
 app.on('ready', createWindow);
@@ -277,6 +287,10 @@ ipcMain.on('isFullScreen', (event, arg) => {
 });
 ipcMain.on('Shift+Esc', (event, arg) => {
   mainWindow.hide();
+});
+ipcMain.on('setBackgroundColor', (event, backgroundColor) => {
+  // 不知道什么原因不起作用
+  mainWindow.setBackgroundColor(backgroundColor);
 });
 
 /**
