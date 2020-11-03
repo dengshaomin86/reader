@@ -218,18 +218,6 @@
         });
       },
 
-      // 根据 buffer 判断编码格式
-      encodingType(buf) {
-        if (buf[0] === 0xff && buf[1] === 0xfe) {
-          return "unicode";
-        } else if (buf[0] === 0xfe && buf[1] === 0xff) {
-          return "unicode";
-        } else if (buf[0] === 0xef && buf[1] === 0xbb) {
-          return "utf8";
-        }
-        return "GBK";
-      },
-
       // 处理书籍内容
       handlerBook(data) {
         WebWorker.run(data => {
