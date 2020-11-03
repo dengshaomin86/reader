@@ -85,7 +85,7 @@
 <script>
   import fs from "fs";
   import path from "path";
-  import iconv from "iconv-lite";
+  import jschardet from "jschardet";
   import {exec} from 'child_process';
   import {remote, ipcRenderer} from "electron";
   import {mapState, mapMutations} from 'vuex';
@@ -190,54 +190,32 @@
         this.setBook(book);
         this.bookChangeFlag = true;
         this.loading = true;
-        fs.readFile(book.url, {encoding: 'binary'}, (err, data) => {
-          if (err) {
-            this.loading = false;
-            console.log(err);
-            return;
-          }
-          if (!data) return;
-          let buf = new Buffer(data, 'binary');
-          let encodingType = this.encodingType(buf);
-          if (encodingType === "unicode") {
-            // this.$message.error("sorry，暂时无法解析 unicode 编码，请转换编码格式为ANSI或UTF8后再试");
-            this.getBookContentByXHR(book);
-            return;
-          }
-          let str = iconv.decode(buf, encodingType);
-          this.handlerBook(str);
+        this.getEncoding(book).then(encoding => {
+          fs.readFile(book.url, encoding, (err, data) => {
+            if (err) {
+              this.loading = false;
+              console.log(err);
+              return;
+            }
+            if (!data) return;
+            this.handlerBook(data);
+          });
+        }).catch(e => {
+          console.log(e);
         });
       },
 
-      // xhr 获取书籍内容
-      getBookContentByXHR(book) {
-        let xhr = new XMLHttpRequest();
-        // 使用open方法初始化
-        // 第一个参数为请求方法 可以为GET、POST或其他
-        // 第二个参数为请求的地址
-        // 第三个参数为true 则为异步执行，为false 则为同步执行
-        xhr.open('GET', `file:/${book.url}`, true);
-        xhr.send(null);
-        xhr.onreadystatechange = () => {
-          switch (xhr.readyState) {
-            case 0:
-              // 此时对象尚未初始化，也没有调用open方法
-              break;
-            case 1:
-              // 此时对象已经调用了open方法，当没有调用send方法
-              break;
-            case 2:
-              // 此时调用了send方法，但服务器还没有给出响应
-              break;
-            case 3:
-              // 此时正在接收服务器的请求，当还没有结束，一般这里不做处理
-              break;
-            case 4:
-              // 此时已经得到了服务器放回的数据，可以开始处理
-              this.handlerBook(xhr.responseText);
-              break;
-          }
-        };
+      // 获取文件编码格式
+      getEncoding(book) {
+        return new Promise((resolve, reject) => {
+          fs.readFile(book.url, (err, data) => {
+            if (err) {
+              reject(err);
+              return;
+            }
+            resolve(jschardet.detect(data).encoding);
+          });
+        });
       },
 
       // 根据 buffer 判断编码格式
