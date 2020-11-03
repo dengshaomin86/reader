@@ -1,0 +1,23 @@
+@font-face {
+  font-family: 'GoodVibrationsROB';
+  /*noinspection CssUnknownTarget*/
+  src: url('~@/assets/font-family/GoodVibrationsROB.ttf');
+}
+
+@font-face {
+  font-family: 'AbductionII';
+  /*noinspection CssUnknownTarget*/
+  src: url("~@/assets/font-family/AbductionII.ttf");
+}
+
+@font-face {
+  font-family: 'AngieTanLines';
+  /*noinspection CssUnknownTarget*/
+  src: url('~@/assets/font-family/AngieTanLines.ttf');
+}
+
+@font-face {
+  font-family: 'Jellyka_-_Love_and_Passion';
+  /*noinspection CssUnknownTarget*/
+  src: url('~@/assets/font-family/Jellyka-Love-and-Passion.ttf');
+}

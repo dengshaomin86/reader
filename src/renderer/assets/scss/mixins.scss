@@ -1,0 +1,6 @@
+@mixin cleanOverflow() {
+  &:before, &:after {
+    display: table;
+    content: "";
+  }
+}
