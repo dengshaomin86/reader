@@ -24,7 +24,7 @@
         <li @click="themeVisible=true">主题</li>
         <li @click="explanationVisible=true">说明</li>
         <li>
-          <el-color-picker v-model="fontColor" show-alpha :predefine="predefineColors" @active-change="fontColorChange"></el-color-picker>
+          <el-color-picker :value="fontColor" show-alpha :predefine="predefineColors" @active-change="fontColorChange"></el-color-picker>
         </li>
       </ul>
     </section>
